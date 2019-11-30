@@ -25,11 +25,13 @@
  *      - Enables Debug Prints
  */
 class ContextArea: public Gtk::DrawingArea {
-    private:        // Private Core Variables
+    protected:      // Shared Variables
         unsigned long long      frameCount;                         // Keep Track of Frames
+        double                  FPS;                                // Total Calulated Frames per Second
+        
+    private:        // Private Core Variables
         CHRONO_HIGH_RES_CLOCK   prevTime;                           // Previous Time since Frame
         int                     elapsedFrames;                      // Counter for Frames Drawn
-        double                  FPS;                                // Total Calulated Frames per Second
         bool                    isInit;                             // Initiated Status, If initContextArea is Called
     
     private:        // Private Core Functions
