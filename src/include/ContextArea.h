@@ -15,6 +15,14 @@
 
 
 /**
+ * Enumeration for Targeted Frames Per Second
+ */
+enum TARGET_FPS {
+    SIXTY, THIRTY, FIFTEEN
+};
+
+
+/**
  * 
  * REQUIRED FUNCTIONS
  *  - initContextArea
@@ -56,6 +64,7 @@ class ContextArea: public Gtk::DrawingArea {
         
     public:         // Public Functions
         void initContextArea();                                     // Must Be Called Prior to Running
+        void initContextArea(TARGET_FPS);                           // Must Be Called Prior to Running With Given FPS Target
         const double getFPS();                                      // Returns Current FPS
     
 

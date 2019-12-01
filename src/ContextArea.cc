@@ -161,17 +161,56 @@ void ContextArea::draw(const CTX_REF& ctx, const int WIDTH, const int HEIGHT) {}
 
 
 /* PUBLIC FUNCTIONS */
+
 /**
  * Initiates everything requried to run properly
+ *  with FPS Target to 30 FPS
  */
 void ContextArea::initContextArea() {
     // Functionality Should work Properly!
     isInit = true;
 
-    // Set "Draw Refresh Rate"      [10 = 60FPS], [33 = 30FPS]
     Glib::signal_timeout().connect(
         sigc::mem_fun(*this, &ContextArea::on_timeout),
-        33
+        34
+    );
+
+    // SETUP VIRTUAL FUNCTION
+    setup();
+}
+
+/**
+ * Initiates everything requried to run properly
+ *  with Given FPS Target
+ * 
+ * @param targetFPS - Enumerator for Targeted FPS
+ */
+void ContextArea::initContextArea(TARGET_FPS targetFPS) {
+    // Functionality Should work Properly!
+    isInit = true;
+
+    // Figure out the Target FPS
+    unsigned int fps_interval;
+    switch(targetFPS) {
+        case FIFTEEN:
+            fps_interval = 68;
+            break;
+        case THIRTY:
+            fps_interval = 34;
+            break;
+        case SIXTY:
+            fps_interval = 10;
+            break;
+        default:
+            fps_interval = 34;
+            break;
+    }
+    
+
+    // Set "Draw Refresh Rate"
+    Glib::signal_timeout().connect(
+        sigc::mem_fun(*this, &ContextArea::on_timeout),
+        fps_interval
     );
 
     // SETUP VIRTUAL FUNCTION
