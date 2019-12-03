@@ -1,5 +1,5 @@
 // CORE CLASSES
-#include "./include/MyWindow.hpp"
+#include "include/MyWindow.h"
 
 // MATHS
 #define _USE_MATH_DEFINES
