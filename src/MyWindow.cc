@@ -78,8 +78,7 @@ bool MyWindow::on_key_release_event(GdkEventKey *event) {
 }
 
 /* MOUSE EVENT CALLBACKS */
-bool MyWindow::on_button_press_event(GdkEventButton *event)
-{
+bool MyWindow::on_button_press_event(GdkEventButton *event) {
     if(!drawArea->onMousePress(event)) this->destroy_();
 	return true;
 }
