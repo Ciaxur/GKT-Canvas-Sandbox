@@ -110,6 +110,19 @@ bool ContextArea::onKeyPress(GdkEventKey *event) {
     return true;
 }
 
+/**
+ * Mouse Press Event
+ * @param event - GDK Event Button
+ */
+bool ContextArea::onMousePress(GdkEventButton *event) {
+    // RIGHT MOUSE CLICK!
+	if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) ) {
+        printf("MOUSE CLICK!\n");
+	}
+
+	return true;
+}
+
 
 
 /* HELPER FUNCTIONS */

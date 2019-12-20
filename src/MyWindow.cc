@@ -12,7 +12,7 @@ void MyWindow::initProperties() {
     drawArea->show();
 
     // SETUP EVENTS
-    Gtk::Window::add_events(Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK);
+    Gtk::Window::add_events(Gdk::KEY_PRESS_MASK | Gdk::KEY_RELEASE_MASK | Gdk::BUTTON_PRESS_MASK);
 }
 
 
@@ -75,4 +75,11 @@ bool MyWindow::on_key_press_event(GdkEventKey *event) {
 bool MyWindow::on_key_release_event(GdkEventKey *event) {
     if(!drawArea->onKeyRelease(event)) this->destroy_();
     return true;
+}
+
+/* MOUSE EVENT CALLBACKS */
+bool MyWindow::on_button_press_event(GdkEventButton *event)
+{
+    if(!drawArea->onMousePress(event)) this->destroy_();
+	return true;
 }

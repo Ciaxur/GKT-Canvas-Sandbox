@@ -41,4 +41,5 @@ class MyWindow : public Gtk::Window {
     private:        // Key Event Callbacks
         bool on_key_press_event(GdkEventKey *event);
         bool on_key_release_event(GdkEventKey *event);
+        bool on_button_press_event(GdkEventButton *event);
 };

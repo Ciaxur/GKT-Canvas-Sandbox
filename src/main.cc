@@ -33,6 +33,10 @@ class MyApp: public ContextArea {
             return true;
         }
 
+        bool onMousePress(GdkEventButton* event) {
+            return true;
+        }
+
         
 
     private:    // DRAWING FUNCTIONS

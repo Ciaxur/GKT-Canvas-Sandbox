@@ -50,6 +50,7 @@ class ContextArea: public Gtk::DrawingArea {
     public:      // Event Functions
         virtual bool onKeyRelease(GdkEventKey*);                    // Key Release Event
         virtual bool onKeyPress(GdkEventKey*);                      // Key Press Event
+        virtual bool onMousePress(GdkEventButton*);                 // Mouse Press Event
     
     protected:      // Helper Functions
         GDK_IMAGE createImageBuffer(std::string);                   // Easy Wrapper for Image Buffer
