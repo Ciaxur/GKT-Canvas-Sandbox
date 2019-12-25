@@ -41,6 +41,11 @@ class ContextArea: public Gtk::DrawingArea {
         CHRONO_HIGH_RES_CLOCK   prevTime;                           // Previous Time since Frame
         int                     elapsedFrames;                      // Counter for Frames Drawn
         bool                    isInit;                             // Initiated Status, If initContextArea is Called
+
+        // GDK Variables
+        GdkDisplay              *display;
+        GdkSeat                 *seat;
+        GdkDevice               *device;
     
     private:        // Private Core Functions
         void calcFramesPerSecond();                                 // Calculates Frames Per Second
@@ -67,6 +72,7 @@ class ContextArea: public Gtk::DrawingArea {
         void initContextArea();                                     // Must Be Called Prior to Running
         void initContextArea(TARGET_FPS);                           // Must Be Called Prior to Running With Given FPS Target
         const double getFPS();                                      // Returns Current FPS
+        void getMousePosition(double &x, double &y);                // Simple Wrapper for Getting Mouse Position
     
 
     public:         // Constructor/Destructor

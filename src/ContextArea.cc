@@ -17,6 +17,11 @@ ContextArea::ContextArea() {
     prevTime = std::chrono::high_resolution_clock::now();
     elapsedFrames = 0;
     FPS = 0.0;
+
+    // SETUP GDK DEVICE MANAGER
+    display = gdk_display_get_default();
+    seat = gdk_display_get_default_seat(display);
+    device = gdk_seat_get_pointer(seat);
 }
 
 /**
@@ -236,4 +241,14 @@ void ContextArea::initContextArea(TARGET_FPS targetFPS) {
  */
 const double ContextArea::getFPS() {
     return FPS;
+}
+
+/**
+ * Simple Wrapper for getting Mouse Position
+ * 
+ * @param x - Reference to x-position of Mouse (Will be stored)
+ * @param y - Reference to y-position of Mouse (Will be stored)
+ */
+void ContextArea::getMousePosition(double &x, double &y) {
+    gdk_device_get_position_double(this->device, NULL, &x, &y);
 }
