@@ -23,11 +23,11 @@ enum TARGET_FPS {
 
 
 /**
- * 
+ *
  * REQUIRED FUNCTIONS
  *  - initContextArea
  *      - Must Be called prior to running
- * 
+ *
  * MACRO DEFINITIONS
  *  - "ENABLE_DEBUG_PRINTS" (True/False)
  *      - Enables Debug Prints
@@ -36,7 +36,7 @@ class ContextArea: public Gtk::DrawingArea {
     protected:      // Shared Variables
         unsigned long long      frameCount;                         // Keep Track of Frames
         double                  FPS;                                // Total Calulated Frames per Second
-        
+
     private:        // Private Core Variables
         CHRONO_HIGH_RES_CLOCK   prevTime;                           // Previous Time since Frame
         int                     elapsedFrames;                      // Counter for Frames Drawn
@@ -46,7 +46,7 @@ class ContextArea: public Gtk::DrawingArea {
         GdkDisplay              *display;
         GdkSeat                 *seat;
         GdkDevice               *device;
-    
+
     private:        // Private Core Functions
         void calcFramesPerSecond();                                 // Calculates Frames Per Second
         bool on_draw(const CTX_REF&) override;                      // Called by GTK
@@ -56,24 +56,24 @@ class ContextArea: public Gtk::DrawingArea {
         virtual bool onKeyRelease(GdkEventKey*);                    // Key Release Event
         virtual bool onKeyPress(GdkEventKey*);                      // Key Press Event
         virtual bool onMousePress(GdkEventButton*);                 // Mouse Press Event
-    
+
     protected:      // Helper Functions
         GDK_IMAGE createImageBuffer(std::string);                   // Easy Wrapper for Image Buffer
         GDK_IMAGE resizeImage(const GDK_IMAGE&, int, int);          // Easy Wrapper for Resizing given Image
         void drawImage(const CTX_REF&, GDK_IMAGE);                  // Draws Given Image at (0,0)
-        
+
 
     protected:      // Shared Functions
         virtual void setup();                                       // Called Prior to Draw
         virtual void draw(const CTX_REF&, const int, const int);    // Easy to use Shared Draw Function
 
-        
+
     public:         // Public Functions
         void initContextArea();                                     // Must Be Called Prior to Running
         void initContextArea(TARGET_FPS);                           // Must Be Called Prior to Running With Given FPS Target
         const double getFPS();                                      // Returns Current FPS
         void getMousePosition(double &x, double &y);                // Simple Wrapper for Getting Mouse Position
-    
+
 
     public:         // Constructor/Destructor
         ContextArea();

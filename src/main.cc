@@ -15,7 +15,7 @@ class MyApp: public ContextArea {
             std::cout << "MyApp Constructed\n";
             initContextArea();
         }
-    
+
 
     private:    // KEYBOARD EVENTS
         bool onKeyPress(GdkEventKey* event) {
@@ -23,7 +23,7 @@ class MyApp: public ContextArea {
                 std::cout << "Quitting out of Application!" << std::endl;
                 return false;
             }
-            
+
             // Return True to keep Running
             return true;
         }
@@ -37,11 +37,11 @@ class MyApp: public ContextArea {
             return true;
         }
 
-        
+
 
     private:    // DRAWING FUNCTIONS
         int xc = 0;
-    
+
         void setup() {
             std::cout << "SETTING UP...\n";
         }

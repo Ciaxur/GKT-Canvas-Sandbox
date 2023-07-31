@@ -29,14 +29,14 @@ MyWindow::MyWindow() {
     // Create and Handle ContextArea
     drawArea = new ContextArea();
     handled = true;
-    
+
     // Initiate Window Properties
     initProperties();
 }
 
 /**
  * Customized Window
- * 
+ *
  * @param _drawArea - Reference to Created ContextArea Object
  * @param width - Window Width
  * @param height - Window Height

@@ -11,7 +11,7 @@
 ContextArea::ContextArea() {
     // Make sure initContextArea is called
     isInit = false;
-    
+
     // SETUP VARIABLES
     frameCount = 0;
     prevTime = std::chrono::high_resolution_clock::now();
@@ -59,7 +59,7 @@ void ContextArea::calcFramesPerSecond() {
 
 /**
  * On Draw Function for Draw Area
- * 
+ *
  * @param ctx - Cairo Context
  */
 bool ContextArea::on_draw(const CTX_REF& ctx) {
@@ -99,7 +99,7 @@ bool ContextArea::onKeyRelease(GdkEventKey *event) {
     if(event->keyval == GDK_KEY_space) {
         printf("SPACE RELEASED\n");
     }
-    
+
     return true;
 }
 
@@ -111,7 +111,7 @@ bool ContextArea::onKeyPress(GdkEventKey *event) {
     if(event->keyval == GDK_KEY_space) {
         printf("SPACE PRESSED\n");
     }
-    
+
     return true;
 }
 
@@ -144,7 +144,7 @@ GDK_IMAGE ContextArea::createImageBuffer(std::string path) {
 
 /**
  * Simple, Easy wrapper for Resizing Image
- * 
+ *
  * @param img - Reference to the Image that'll be resized
  * @param newWidth - New Width of Image
  * @param newHeight - New Height of Image
@@ -157,7 +157,7 @@ GDK_IMAGE ContextArea::resizeImage(const GDK_IMAGE& img, int newWidth, int newHe
 /**
  * Draws Given Image from Path as large as the image
  *  is.
- * 
+ *
  * @param ctx - Cario Drawing Context
  * @param path - Image Path
  */
@@ -166,7 +166,7 @@ void ContextArea::drawImage(const CTX_REF& ctx, GDK_IMAGE img) {
     ctx->rectangle(0, 0, img->get_width(), img->get_height());
     ctx->fill();
 }
-        
+
 
 
 /* SHARED FUNCTIONS */
@@ -175,7 +175,7 @@ void ContextArea::setup() {
     std::cout << "Default Setup\n";
 }
 void ContextArea::draw(const CTX_REF& ctx, const int WIDTH, const int HEIGHT) {}
-        
+
 
 
 /* PUBLIC FUNCTIONS */
@@ -200,7 +200,7 @@ void ContextArea::initContextArea() {
 /**
  * Initiates everything requried to run properly
  *  with Given FPS Target
- * 
+ *
  * @param targetFPS - Enumerator for Targeted FPS
  */
 void ContextArea::initContextArea(TARGET_FPS targetFPS) {
@@ -217,13 +217,13 @@ void ContextArea::initContextArea(TARGET_FPS targetFPS) {
             fps_interval = 34;
             break;
         case SIXTY:
-            fps_interval = 10;
+            fps_interval = 16;
             break;
         default:
             fps_interval = 34;
             break;
     }
-    
+
 
     // Set "Draw Refresh Rate"
     Glib::signal_timeout().connect(
@@ -245,7 +245,7 @@ const double ContextArea::getFPS() {
 
 /**
  * Simple Wrapper for getting Mouse Position
- * 
+ *
  * @param x - Reference to x-position of Mouse (Will be stored)
  * @param y - Reference to y-position of Mouse (Will be stored)
  */

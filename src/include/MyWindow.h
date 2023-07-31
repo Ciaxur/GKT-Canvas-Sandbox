@@ -9,13 +9,13 @@ class MyWindow : public Gtk::Window {
     private:
         ContextArea *drawArea;      // Pointer to ContextArea Object
         bool handled;               // If drawArea is Handled by Current Object
-    
+
     private:
         /**
          * Initiates Common Properties
          */
         void initProperties();
-    
+
     public:
         /**
          * Create Default Window
@@ -24,7 +24,7 @@ class MyWindow : public Gtk::Window {
 
         /**
          * Customized Window
-         * 
+         *
          * @param _drawArea - Reference to Created ContextArea Object
          * @param width - Window Width
          * @param height - Window Height
