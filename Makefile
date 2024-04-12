@@ -1,11 +1,12 @@
 # COMPILER OTHER INFO
-CC 			= g++
-FLAGS 		= `pkg-config gtkmm-3.0 --cflags --libs`
-SRC_DIR 	= src
+CC 			    = g++
+FLAGS 		  = `pkg-config gtkmm-3.0 --cflags --libs`
+SRC_DIR 	  = src
+INCLUDE_DIR = include
 
 # COMPILING ALL
 FILES 		= *.cc
-OUT 		= app
+OUT 		  = app
 
 # SHARED LIBRARY VARS (aside from main)
 LIB_FILES 	= ContextArea.cc MyWindow.cc
@@ -14,17 +15,16 @@ OBJ_OUT   	= lib
 
 # GENERATE PATHS
 LIB_PATH	= $(patsubst %,../$(SRC_DIR)/%,$(LIB_FILES))
-
-
+INCLUDES  = "-I$(INCLUDE_DIR)"
 
 # BUILDS EVERYTHING INTO BINARY FILE #
 build-all:
-	$(CC) $(SRC_DIR)/*.cc -o $(OUT) $(FLAGS)
+	$(CC) $(INCLUDES) $(SRC_DIR)/*.cc -o $(OUT) $(FLAGS)
 
 
 # BUILDS MAIN FILE USING OBJECT FILES #
 build-with-SharedLibraries:
-	$(CC) $(SRC_DIR)/main.cc $(OBJ_OUT)/*.o -o $(OUT) $(FLAGS)
+	$(CC) $(INCLUDES) $(SRC_DIR)/main.cc $(OBJ_OUT)/*.o -o $(OUT) $(FLAGS)
 
 
 # BUILD SHARED LIBRARIES IN OBJ_OUT #

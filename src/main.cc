@@ -1,5 +1,6 @@
 // CORE CLASSES
-#include "include/MyWindow.h"
+#include "MyWindow.h"
+#include "spdlog/spdlog.h"
 
 // MATHS
 #define _USE_MATH_DEFINES
@@ -12,7 +13,7 @@
 class MyApp: public ContextArea {
     public:
         MyApp() {
-            std::cout << "MyApp Constructed\n";
+            spdlog::info("MyApp Constructed");
             initContextArea();
         }
 
@@ -20,7 +21,7 @@ class MyApp: public ContextArea {
     private:    // KEYBOARD EVENTS
         bool onKeyPress(GdkEventKey* event) {
             if(event->keyval == GDK_KEY_q) {        // Quit on Key Press 'Q'
-                std::cout << "Quitting out of Application!" << std::endl;
+                spdlog::info("Quitting out of Application!");
                 return false;
             }
 
@@ -43,7 +44,7 @@ class MyApp: public ContextArea {
         int xc = 0;
 
         void setup() {
-            std::cout << "SETTING UP...\n";
+            spdlog::info("SETTING UP...");
         }
 
         void draw(const CTX_REF& ctx, const int WIDTH, const int HEIGHT) {

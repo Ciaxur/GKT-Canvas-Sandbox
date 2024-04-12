@@ -1,5 +1,5 @@
 #pragma once
-#include "./ContextArea.h"
+#include "ContextArea.h"
 
 /**
  * Simple Window Class that Handles GTK

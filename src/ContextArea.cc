@@ -1,4 +1,5 @@
-#include "include/ContextArea.h"
+#include "ContextArea.h"
+#include "spdlog/spdlog.h"
 
 
 
@@ -48,7 +49,7 @@ void ContextArea::calcFramesPerSecond() {
 
             // DEBUG: Prints
             #if ENABLE_DEBUG_PRINTS
-                std::cout << "FPS [" << FPS << "]\n";
+                spdlog::info("FPS [" + FPS + "]");
             #endif
         }
     }
@@ -172,7 +173,7 @@ void ContextArea::drawImage(const CTX_REF& ctx, GDK_IMAGE img) {
 /* SHARED FUNCTIONS */
 
 void ContextArea::setup() {
-    std::cout << "Default Setup\n";
+    spdlog::info("Default Setup");
 }
 void ContextArea::draw(const CTX_REF& ctx, const int WIDTH, const int HEIGHT) {}
 

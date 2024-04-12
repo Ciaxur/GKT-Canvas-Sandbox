@@ -1,4 +1,4 @@
-#include "include/MyWindow.h"
+#include "MyWindow.h"
 
 
 /* SETUP METHODS */
