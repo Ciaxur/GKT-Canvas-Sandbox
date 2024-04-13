@@ -8,29 +8,28 @@ INCLUDE_DIR = include
 FILES 		= *.cc
 OUT 		  = app
 
+# SPDLOG STUFF
+SPDLOG_GIT = vendor/spdlog.git
+
 # SHARED LIBRARY VARS (aside from main)
-LIB_FILES 	= ContextArea.cc MyWindow.cc
-OBJ_FILES 	= ContextArea.o MyWindow.o
 OBJ_OUT   	= lib
 
 # GENERATE PATHS
-LIB_PATH	= $(patsubst %,../$(SRC_DIR)/%,$(LIB_FILES))
 INCLUDES  = "-I$(INCLUDE_DIR)"
 
 # BUILDS EVERYTHING INTO BINARY FILE #
-build-all:
-	$(CC) $(INCLUDES) $(SRC_DIR)/*.cc -o $(OUT) $(FLAGS)
+build: libspdlog.a ContextArea.o MyWindow.o
+	$(CC) $(INCLUDES) $(SRC_DIR)/main.cc *.a *.o -o $(OUT) $(FLAGS)
 
+# Builds the spdlog shared library.
+libspdlog.a:
+	cd $(SPDLOG_GIT); cd build; cmake ..; make -j 4; mv $(PWD)/$(SPDLOG_GIT)/build/libspdlog.a $(PWD)/.
 
-# BUILDS MAIN FILE USING OBJECT FILES #
-build-with-SharedLibraries:
-	$(CC) $(INCLUDES) $(SRC_DIR)/main.cc $(OBJ_OUT)/*.o -o $(OUT) $(FLAGS)
+ContextArea.o:
+	$(CC) $(FLAGS) $(INCLUDES) $(SRC_DIR)/ContextArea.cc -c -o ContextArea.o
 
-
-# BUILD SHARED LIBRARIES IN OBJ_OUT #
-generate-SharedLibraries:
-	mkdir -p $(OBJ_OUT)
-	cd $(OBJ_OUT); $(CC) -c $(LIB_PATH) $(FLAGS)
+MyWindow.o:
+	$(CC) $(FLAGS) $(INCLUDES) $(SRC_DIR)/MyWindow.cc -c -o MyWindow.o
 
 # REMOVES COMPILED BINARY #
 clean:
@@ -38,4 +37,4 @@ clean:
 
 # REMOVES COMPILES BINARY AND OBJECT FILES #
 clean-all:
-	rm $(OUT) $(OBJ_OUT)/*.o
+	rm $(OUT) *.o *.a
