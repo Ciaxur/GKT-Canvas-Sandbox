@@ -193,9 +193,67 @@ void ContextArea::background(const Context& ctx, RgbaColor color) {
  * @param color - RgbaColor struct.
  */
 void ContextArea::circle(const Context& ctx, double x, double y, double r, RgbaColor color) {
-  ctx.cairo_ctx->set_source_rgba(color.r, color.g, color.b, color.a);
+  set_color(ctx, color);
   ctx.cairo_ctx->arc(x, y, r, 0, M_PI*2);
   ctx.cairo_ctx->fill();
+}
+
+/**
+ * Sets drawing context color.
+ *
+ * @param ctx - Drawing Context
+ * @param color - RgbaColor struct.
+ */
+void ContextArea::set_color(const Context& ctx, RgbaColor color) {
+  ctx.cairo_ctx->set_source_rgba(color.r, color.g, color.b, color.a);
+}
+
+/**
+ * Sets drawing context text font size.
+ *
+ * @param ctx - Drawing Context
+ * @param size - Font size
+ */
+void ContextArea::set_font_size(const Context& ctx, double size) {
+  ctx.cairo_ctx->set_font_size(size);
+}
+
+/**
+ * Draws text at the given coordinates.
+ *
+ * @param ctx - Drawing Context.
+ * @param x - x-coordinate to draw text at.
+ * @param y - y-coordinate to draw text at.
+ * @param text - Text to draw.
+ */
+void ContextArea::draw_text(const Context& ctx, double x, double y, const char* text) {
+  ctx.cairo_ctx->select_font_face("Sans", Cairo::FONT_SLANT_NORMAL, Cairo::FONT_WEIGHT_NORMAL);
+  ctx.cairo_ctx->move_to(x, y);
+  ctx.cairo_ctx->show_text(text);
+}
+
+/**
+ * Draws drawing statistics on the top right of the window.
+ *  - FPS
+ *  - Window dimensions
+ *
+ * @param ctx - Drawing Context.
+ */
+void ContextArea::display_nerd_info(const Context& ctx) {
+  const double font_size = 20.0;
+  set_color(ctx, RgbaColor{ .r = 3.0, .a = 1.0 });
+  set_font_size(ctx, font_size);
+
+  // DRAW FPS COUNTER.
+  // Interpret FPS double as a string.
+  char fps_buffer[255];
+  int bytes_written = snprintf(fps_buffer, sizeof(fps_buffer), "FPS: %.2f", this->getFPS());
+  draw_text(ctx, ctx.width - (font_size * bytes_written / 2.f), font_size, fps_buffer);
+
+  // DRAW WINDOW DIMENSIONS.
+  char dim_buffer[255];
+  bytes_written = snprintf(dim_buffer, sizeof(dim_buffer), "Window: width[%d] height[%d]", ctx.width, ctx.height);
+  draw_text(ctx, ctx.width - (font_size * bytes_written / 2.f) - 4.f, font_size + font_size + 2.0, dim_buffer);
 }
 
 
