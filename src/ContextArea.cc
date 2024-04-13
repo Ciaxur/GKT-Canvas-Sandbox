@@ -62,14 +62,21 @@ void ContextArea::calcFramesPerSecond() {
  *
  * @param ctx - Cairo Context
  */
-bool ContextArea::on_draw(const CTX_REF& ctx) {
+bool ContextArea::on_draw(const CAIRO_CTX_REF& cairo_ctx) {
   // GET WINDOW DIMENSION DATA
   Gtk::Allocation allocation = get_allocation();
   const int WIDTH = allocation.get_width();
   const int HEIGHT = allocation.get_height();
 
+  // CONSTRUCT CONTEXT
+  const Context ctx{
+    .cairo_ctx = cairo_ctx,
+    .width = WIDTH,
+    .height = HEIGHT,
+  };
+
   // CALL VIRTUAL DRAW
-  draw(ctx, WIDTH, HEIGHT);
+  draw(ctx);
 
   // COUNTER TRACK
   calcFramesPerSecond();
@@ -155,10 +162,22 @@ GDK_IMAGE ContextArea::resizeImage(const GDK_IMAGE& img, int newWidth, int newHe
  * @param ctx - Cario Drawing Context
  * @param path - Image Path
  */
-void ContextArea::drawImage(const CTX_REF& ctx, GDK_IMAGE img) {
-  Gdk::Cairo::set_source_pixbuf(ctx, img, 0, 0);
-  ctx->rectangle(0, 0, img->get_width(), img->get_height());
-  ctx->fill();
+void ContextArea::drawImage(const Context& ctx, GDK_IMAGE img) {
+  Gdk::Cairo::set_source_pixbuf(ctx.cairo_ctx, img, 0, 0);
+  ctx.cairo_ctx->rectangle(0, 0, img->get_width(), img->get_height());
+  ctx.cairo_ctx->fill();
+}
+
+/**
+ * Draws background color given the context and color to set background to.
+ *
+ * @param ctx - Cario Drawing Context
+ * @param color - RgbaColor struct.
+ */
+void ContextArea::background(const Context& ctx, RgbaColor color) {
+  // Draw Background Color
+  // ctx->set_source_rgba(color.r, color.g, color.b, color.a);
+  // ctx->rectangle()
 }
 
 
@@ -168,7 +187,8 @@ void ContextArea::drawImage(const CTX_REF& ctx, GDK_IMAGE img) {
 void ContextArea::setup() {
   spdlog::info("Default Setup");
 }
-void ContextArea::draw(const CTX_REF& ctx, const int WIDTH, const int HEIGHT) {}
+
+void ContextArea::draw(const Context& ctx) {}
 
 
 

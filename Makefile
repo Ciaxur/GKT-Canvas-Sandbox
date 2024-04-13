@@ -35,6 +35,10 @@ MyWindow.o:
 clean:
 	rm $(OUT)
 
+# REMOVES PRE-COMPILED PROJECT LIBRARIES #
+clean-obj:
+	rm *.o
+
 # REMOVES COMPILES BINARY AND OBJECT FILES #
-clean-all:
-	rm $(OUT) *.o *.a
+clean-all: clean-obj
+	rm $(OUT) *.a

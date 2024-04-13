@@ -45,19 +45,19 @@ class MyApp: public ContextArea {
       spdlog::info("SETTING UP...");
     }
 
-    void draw(const CTX_REF& ctx, const int WIDTH, const int HEIGHT) {
+    void draw(const Context& ctx) {
       // Draw Background Color
-      ctx->set_source_rgb(3.0, 3.0, 3.0);
-      ctx->rectangle(0, 0, WIDTH, HEIGHT);
-      ctx->fill();
+      ctx.cairo_ctx->set_source_rgb(3.0, 3.0, 3.0);
+      ctx.cairo_ctx->rectangle(0, 0, ctx.width, ctx.height);
+      ctx.cairo_ctx->fill();
 
       // Draw Circle Traveling Across Sceen
-      ctx->set_source_rgb(1.0, 0.0, 0.0);
-      ctx->arc(xc, HEIGHT/2, 20, 0, M_PI*2);
-      ctx->fill();
+      ctx.cairo_ctx->set_source_rgb(1.0, 0.0, 0.0);
+      ctx.cairo_ctx->arc(xc, ctx.height/2, 20, 0, M_PI*2);
+      ctx.cairo_ctx->fill();
 
       // Increment xc Till the Edge
-      xc = (xc + 2) % WIDTH;
+      xc = (xc + 2) % ctx.width;
     }
 };
 
