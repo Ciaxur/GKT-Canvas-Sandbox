@@ -1,6 +1,8 @@
 #include "ContextArea.h"
 #include "spdlog/spdlog.h"
 
+// DEBUG: Debug Prints
+// #define ENABLE_DEBUG_PRINTS
 
 
 /* CONSTRUCTORS / DESTRUCTORS */
@@ -47,8 +49,8 @@ void ContextArea::calcFramesPerSecond() {
       elapsedFrames = 0;
 
       // DEBUG: Prints
-      #if ENABLE_DEBUG_PRINTS
-        spdlog::info("FPS [" + FPS + "]");
+      #ifdef ENABLE_DEBUG_PRINTS
+        spdlog::info("FPS [%.2f]", FPS);
       #endif
     }
   }

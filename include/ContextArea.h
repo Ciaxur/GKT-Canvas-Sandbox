@@ -10,10 +10,6 @@
 #define CAIRO_CTX_REF Cairo::RefPtr<Cairo::Context>
 #define CHRONO_HIGH_RES_CLOCK std::chrono::time_point<std::chrono::_V2::system_clock, std::chrono::nanoseconds>
 
-// DEBUG: Debug Prints
-#define ENABLE_DEBUG_PRINTS 0
-
-
 /**
  * Enumeration for Targeted Frames Per Second
  */
