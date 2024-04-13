@@ -173,15 +173,30 @@ void ContextArea::drawImage(const Context& ctx, GDK_IMAGE img) {
 /**
  * Draws background color given the context and color to set background to.
  *
- * @param ctx - Cario Drawing Context
+ * @param ctx - Drawing Context
  * @param color - RgbaColor struct.
  */
 void ContextArea::background(const Context& ctx, RgbaColor color) {
   // Draw Background Color
-  // ctx->set_source_rgba(color.r, color.g, color.b, color.a);
-  // ctx->rectangle()
+  ctx.cairo_ctx->set_source_rgba(color.r, color.g, color.b, color.a);
+  ctx.cairo_ctx->rectangle(0, 0, ctx.width, ctx.height);
+  ctx.cairo_ctx->fill();
 }
 
+/**
+ * Draws circle at given coordinates.
+ *
+ * @param ctx - Drawing Context
+ * @param x - x-coordinate to draw circle at.
+ * @param y - y-coordinate to draw circle at.
+ * @param r - Circle's radius.
+ * @param color - RgbaColor struct.
+ */
+void ContextArea::circle(const Context& ctx, double x, double y, double r, RgbaColor color) {
+  ctx.cairo_ctx->set_source_rgba(color.r, color.g, color.b, color.a);
+  ctx.cairo_ctx->arc(x, y, r, 0, M_PI*2);
+  ctx.cairo_ctx->fill();
+}
 
 
 /* SHARED FUNCTIONS */

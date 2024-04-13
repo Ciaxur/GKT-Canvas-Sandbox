@@ -64,7 +64,7 @@ class ContextArea: public Gtk::DrawingArea {
 
   private:        // Private Core Functions
     void calcFramesPerSecond();                                 // Calculates Frames Per Second
-    bool on_draw(const CAIRO_CTX_REF&) override;                      // Called by GTK
+    bool on_draw(const CAIRO_CTX_REF&) override;                // Called by GTK
     bool on_timeout();                                          // Timer for Re-Draw
 
   public:      // Event Functions
@@ -77,6 +77,9 @@ class ContextArea: public Gtk::DrawingArea {
     GDK_IMAGE resizeImage(const GDK_IMAGE&, int, int);          // Easy Wrapper for Resizing given Image
     void drawImage(const Context&, GDK_IMAGE);                  // Draws Given Image at (0,0)
     void background(const Context&, RgbaColor);                 // Draws background color.
+
+    // Draws a circle at given coordinates.
+    void circle(const Context&, double x, double y, double r, RgbaColor);
 
 
   protected:      // Shared Functions

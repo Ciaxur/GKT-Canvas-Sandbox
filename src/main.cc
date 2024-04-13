@@ -47,14 +47,20 @@ class MyApp: public ContextArea {
 
     void draw(const Context& ctx) {
       // Draw Background Color
-      ctx.cairo_ctx->set_source_rgb(3.0, 3.0, 3.0);
-      ctx.cairo_ctx->rectangle(0, 0, ctx.width, ctx.height);
-      ctx.cairo_ctx->fill();
+      background(ctx, RgbaColor{
+        .r = 3.0,
+        .g = 3.0,
+        .b = 3.0,
+        .a = 1.0,
+      });
 
       // Draw Circle Traveling Across Sceen
-      ctx.cairo_ctx->set_source_rgb(1.0, 0.0, 0.0);
-      ctx.cairo_ctx->arc(xc, ctx.height/2, 20, 0, M_PI*2);
-      ctx.cairo_ctx->fill();
+      circle(ctx, xc, ctx.height/2, 20, RgbaColor{
+        .r = 1.0,
+        .g = 0.0,
+        .b = 0.0,
+        .a = 1.0,
+      });
 
       // Increment xc Till the Edge
       xc = (xc + 2) % ctx.width;
