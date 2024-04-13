@@ -51,7 +51,7 @@ void ContextArea::calc_frames_per_second() {
 
       // DEBUG: Prints
       #ifdef ENABLE_DEBUG_PRINTS
-        spdlog::info("fps [%.2f]", fps);
+        spdlog::info("fps [{:.2f}]", fps);
       #endif
     }
   }

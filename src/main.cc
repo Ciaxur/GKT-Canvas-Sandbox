@@ -6,6 +6,23 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+struct Vector2D {
+  double x;
+  double y;
+};
+
+struct Body {
+  // Coordinates.
+  Vector2D loc;
+
+  // TODO: implement better bounding.
+  double radius;
+
+  // Physics!
+  Vector2D velocity;
+  Vector2D acceleration;
+};
+
 
 /**
  * Simple Example for Sandbox Use :)
@@ -39,13 +56,85 @@ class MyApp: public ContextArea {
     }
 
   private:    // DRAWING FUNCTIONS
-    int xc = 0;
+    Vector2D gravity{
+      .x = 0.f,
+      .y = 0.1f,
+    };
+    Body circle_body1;
 
     void setup(const Context& ctx) {
       spdlog::info("SETTING UP...");
+
+      this->circle_body1 = Body {
+        // Intiial position.
+        .loc = Vector2D{
+          .x = ctx.width / 2.f,
+          .y = ctx.height / 2.f,
+        },
+        .radius = 20.f,
+
+        // Initial force.
+        .velocity = Vector2D{
+          .x = 0.f,
+          .y = 0.f,
+        },
+        .acceleration = Vector2D{
+          .x = 5.f,
+          .y = 0.f,
+        },
+      };
+    }
+
+    void update_physics(const Context& ctx, Body *body) {
+      // Apply gravity.
+      body->acceleration.y += gravity.y;
+
+      // Apply velocity.
+      body->velocity.x += body->acceleration.x;
+      body->velocity.y += body->acceleration.y;
+
+      // Apply displacement.
+      body->loc.x += body->velocity.x;
+      body->loc.y += body->velocity.y;
+
+      // Apply bounce when contacting an edge.
+      // Bottom edge.
+      if (body->loc.y + circle_body1.radius>= ctx.height)
+        body->acceleration.y *= -1.f;
+
+      // Top edge.
+      if (body->loc.y - circle_body1.radius <= 0)
+        body->acceleration.y *= -1.f;
+
+      // Left edge.
+      if (body->loc.x - circle_body1.radius <= 0)
+        body->acceleration.x *= -1.f;
+
+      // Right edge.
+      if (body->loc.x + circle_body1.radius >= ctx.width)
+        body->acceleration.x *= -1.f;
+
+      // Reset velocity.
+      body->velocity.x = 0;
+      body->velocity.y = 0;
     }
 
     void draw(const Context& ctx) {
+      // Static color definitions.
+      static const RgbaColor RED{
+        .r = 1.0,
+        .g = 0.0,
+        .b = 0.0,
+        .a = 1.0,
+      };
+      static const RgbaColor BLUE{
+        .r = 0.0,
+        .g = 0.0,
+        .b = 1.0,
+        .a = 1.0,
+      };
+
+
       // Draw Background Color
       background(ctx, RgbaColor{
         .r = 3.0,
@@ -57,16 +146,11 @@ class MyApp: public ContextArea {
       // Draw nerd info at the top right.
       display_nerd_info(ctx);
 
-      // Draw Circle Traveling Across Sceen
-      circle(ctx, xc, ctx.height/2, 20, RgbaColor{
-        .r = 1.0,
-        .g = 0.0,
-        .b = 0.0,
-        .a = 1.0,
-      });
+      // Draw Circle Traveling Across Screen
+      circle(ctx, circle_body1.loc.x, circle_body1.loc.y, circle_body1.radius, RED);
 
-      // Increment xc Till the Edge
-      xc = (xc + 20) % ctx.width;
+      // Update the physics on bodies.
+      update_physics(ctx, &circle_body1);
     }
 };
 
