@@ -40,7 +40,7 @@ struct Context {
 /**
  *
  * REQUIRED FUNCTIONS
- *  - initContextArea
+ *  - init_context_area
  *      - Must Be called prior to running
  *
  * MACRO DEFINITIONS
@@ -49,13 +49,14 @@ struct Context {
  */
 class ContextArea: public Gtk::DrawingArea {
   protected:      // Shared Variables
-    unsigned long long      frameCount;                         // Keep Track of Frames
-    double                  FPS;                                // Total Calulated Frames per Second
+    unsigned long long      frame_count;                        // Keep Track of Frames
+    double                  fps;                                // Total Calulated Frames per Second
 
   private:        // Private Core Variables
-    CHRONO_HIGH_RES_CLOCK   prevTime;                           // Previous Time since Frame
-    int                     elapsedFrames;                      // Counter for Frames Drawn
-    bool                    isInit;                             // Initiated Status, If initContextArea is Called
+    CHRONO_HIGH_RES_CLOCK   prev_time;                          // Previous Time since Frame
+    int                     elapsed_frames;                     // Counter for Frames Drawn
+    bool                    is_init;                            // Initiated Status, If init_context_area is Called
+    bool                    setup_called;                       // State of setup being invoked.
 
     // GDK Variables
     GdkDisplay              *display;
@@ -63,19 +64,19 @@ class ContextArea: public Gtk::DrawingArea {
     GdkDevice               *device;
 
   private:        // Private Core Functions
-    void calcFramesPerSecond();                                 // Calculates Frames Per Second
+    void calc_frames_per_second();                              // Calculates Frames Per Second
     bool on_draw(const CAIRO_CTX_REF&) override;                // Called by GTK
     bool on_timeout();                                          // Timer for Re-Draw
 
   public:      // Event Functions
-    virtual bool onKeyRelease(GdkEventKey*);                    // Key Release Event
-    virtual bool onKeyPress(GdkEventKey*);                      // Key Press Event
-    virtual bool onMousePress(GdkEventButton*);                 // Mouse Press Event
+    virtual bool on_key_release(GdkEventKey*);                  // Key Release Event
+    virtual bool on_key_press(GdkEventKey*);                    // Key Press Event
+    virtual bool on_mouse_press(GdkEventButton*);               // Mouse Press Event
 
   protected:      // Helper Functions
-    GDK_IMAGE createImageBuffer(std::string);                   // Easy Wrapper for Image Buffer
-    GDK_IMAGE resizeImage(const GDK_IMAGE&, int, int);          // Easy Wrapper for Resizing given Image
-    void drawImage(const Context&, GDK_IMAGE);                  // Draws Given Image at (0,0)
+    GDK_IMAGE create_image_buffer(std::string);                 // Easy Wrapper for Image Buffer
+    GDK_IMAGE resize_image(const GDK_IMAGE&, int, int);         // Easy Wrapper for Resizing given Image
+    void draw_image(const Context&, GDK_IMAGE);                 // Draws Given Image at (0,0)
     void background(const Context&, RgbaColor);                 // Draws background color.
 
     // Draws a circle at given coordinates.
@@ -90,20 +91,20 @@ class ContextArea: public Gtk::DrawingArea {
     // Draws text at the given coordinates.
     void draw_text(const Context&, double x, double y, const char*);
 
-    // Draws information such as FPS at the top right.
+    // Draws information such as fps at the top right.
     void display_nerd_info(const Context&);
 
 
   protected:      // Shared Functions
-    virtual void setup();                                       // Called Prior to Draw
-    virtual void draw(const Context&);                          // Easy to use Shared Draw Function
+    virtual void setup(const Context&);                         // Called ONCE prior to Draw function
+    virtual void draw(const Context&);                          // Easy to use Shared Draw function
 
 
   public:         // Public Functions
-    void initContextArea();                                     // Must Be Called Prior to Running
-    void initContextArea(TARGET_FPS);                           // Must Be Called Prior to Running With Given FPS Target
-    const double getFPS();                                      // Returns Current FPS
-    void getMousePosition(double &x, double &y);                // Simple Wrapper for Getting Mouse Position
+    void init_context_area();                                   // Must Be Called Prior to Running
+    void init_context_area(TARGET_FPS);                         // Must Be Called Prior to Running With Given fps Target
+    const double get_fps();                                     // Returns Current fps
+    void get_mouse_position(double &x, double &y);              // Simple Wrapper for Getting Mouse Position
 
   public:         // Constructor/Destructor
     ContextArea();

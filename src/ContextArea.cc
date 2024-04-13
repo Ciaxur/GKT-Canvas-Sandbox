@@ -12,14 +12,15 @@
  *  and Core Functionality
  */
 ContextArea::ContextArea() {
-  // Make sure initContextArea is called
-  isInit = false;
+  // Make sure init_context_area is called
+  is_init = false;
+  setup_called = false;
 
   // SETUP VARIABLES
-  frameCount = 0;
-  prevTime = std::chrono::high_resolution_clock::now();
-  elapsedFrames = 0;
-  FPS = 0.0;
+  frame_count = 0;
+  prev_time = std::chrono::high_resolution_clock::now();
+  elapsed_frames = 0;
+  fps = 0.0;
 
   // SETUP GDK DEVICE MANAGER
   display = gdk_display_get_default();
@@ -38,23 +39,23 @@ ContextArea::~ContextArea() {}
 /**
  * Keeps Track / Calculates Frames Per Second
  */
-void ContextArea::calcFramesPerSecond() {
-  // GET FPS
+void ContextArea::calc_frames_per_second() {
+  // GET fps
   auto now = std::chrono::high_resolution_clock::now();
-  auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - prevTime);
+  auto elapsed = std::chrono::duration_cast<std::chrono::seconds>(now - prev_time);
   if (elapsed.count() >= 1) {     // 1 Second Elapsed
-    prevTime = now;
-    if(elapsedFrames != 0) {    // No Div by 0, end of the world!
-      FPS = elapsedFrames / elapsed.count();
-      elapsedFrames = 0;
+    prev_time = now;
+    if(elapsed_frames != 0) {    // No Div by 0, end of the world!
+      fps = elapsed_frames / elapsed.count();
+      elapsed_frames = 0;
 
       // DEBUG: Prints
       #ifdef ENABLE_DEBUG_PRINTS
-        spdlog::info("FPS [%.2f]", FPS);
+        spdlog::info("fps [%.2f]", fps);
       #endif
     }
   }
-  elapsedFrames++;
+  elapsed_frames++;
 }
 
 
@@ -77,13 +78,19 @@ bool ContextArea::on_draw(const CAIRO_CTX_REF& cairo_ctx) {
     .height = HEIGHT,
   };
 
+  // SETUP VIRTUAL FUNCTION
+  if (!this->setup_called) {
+    setup(ctx);
+    this->setup_called = true;
+  }
+
   // CALL VIRTUAL DRAW
   draw(ctx);
 
   // COUNTER TRACK
-  calcFramesPerSecond();
-  frameCount++;
-  return isInit;          // Makes sure everything running smoothly
+  calc_frames_per_second();
+  frame_count++;
+  return is_init;          // Makes sure everything running smoothly
 }
 
 /**
@@ -104,9 +111,9 @@ bool ContextArea::on_timeout() {
  * Key Release Event
  * @param event - GDK Event Key
  */
-bool ContextArea::onKeyRelease(GdkEventKey *event) {
+bool ContextArea::on_key_release(GdkEventKey *event) {
   if(event->keyval == GDK_KEY_space)
-    printf("SPACE RELEASED\n");
+    spdlog::info("SPACE RELEASED");
 
   return true;
 }
@@ -115,9 +122,9 @@ bool ContextArea::onKeyRelease(GdkEventKey *event) {
  * Key Press Event
  * @param event - GDK Event Key
  */
-bool ContextArea::onKeyPress(GdkEventKey *event) {
+bool ContextArea::on_key_press(GdkEventKey *event) {
   if(event->keyval == GDK_KEY_space)
-    printf("SPACE PRESSED\n");
+    spdlog::info("SPACE PRESSED");
   return true;
 }
 
@@ -125,10 +132,10 @@ bool ContextArea::onKeyPress(GdkEventKey *event) {
  * Mouse Press Event
  * @param event - GDK Event Button
  */
-bool ContextArea::onMousePress(GdkEventButton *event) {
+bool ContextArea::on_mouse_press(GdkEventButton *event) {
     // RIGHT MOUSE CLICK!
   if( (event->type == GDK_BUTTON_PRESS) && (event->button == 3) )
-    printf("MOUSE CLICK!\n");
+    spdlog::info("MOUSE CLICK!");
 	return true;
 }
 
@@ -141,7 +148,7 @@ bool ContextArea::onMousePress(GdkEventButton *event) {
  * @param path - Path to Image
  * @returns Image Reference Buffer
  */
-GDK_IMAGE ContextArea::createImageBuffer(std::string path) {
+GDK_IMAGE ContextArea::create_image_buffer(std::string path) {
   return Gdk::Pixbuf::create_from_file(path);
 }
 
@@ -153,7 +160,7 @@ GDK_IMAGE ContextArea::createImageBuffer(std::string path) {
  * @param newHeight - New Height of Image
  * @return New GDK_IMAGE of Resized Image
  */
-GDK_IMAGE ContextArea::resizeImage(const GDK_IMAGE& img, int newWidth, int newHeight) {
+GDK_IMAGE ContextArea::resize_image(const GDK_IMAGE& img, int newWidth, int newHeight) {
   return img->scale_simple(newWidth, newHeight, Gdk::InterpType::INTERP_NEAREST);
 }
 
@@ -164,7 +171,7 @@ GDK_IMAGE ContextArea::resizeImage(const GDK_IMAGE& img, int newWidth, int newHe
  * @param ctx - Cario Drawing Context
  * @param path - Image Path
  */
-void ContextArea::drawImage(const Context& ctx, GDK_IMAGE img) {
+void ContextArea::draw_image(const Context& ctx, GDK_IMAGE img) {
   Gdk::Cairo::set_source_pixbuf(ctx.cairo_ctx, img, 0, 0);
   ctx.cairo_ctx->rectangle(0, 0, img->get_width(), img->get_height());
   ctx.cairo_ctx->fill();
@@ -234,7 +241,7 @@ void ContextArea::draw_text(const Context& ctx, double x, double y, const char* 
 
 /**
  * Draws drawing statistics on the top right of the window.
- *  - FPS
+ *  - fps
  *  - Window dimensions
  *
  * @param ctx - Drawing Context.
@@ -244,10 +251,10 @@ void ContextArea::display_nerd_info(const Context& ctx) {
   set_color(ctx, RgbaColor{ .r = 3.0, .a = 1.0 });
   set_font_size(ctx, font_size);
 
-  // DRAW FPS COUNTER.
-  // Interpret FPS double as a string.
+  // DRAW fps COUNTER.
+  // Interpret fps double as a string.
   char fps_buffer[255];
-  int bytes_written = snprintf(fps_buffer, sizeof(fps_buffer), "FPS: %.2f", this->getFPS());
+  int bytes_written = snprintf(fps_buffer, sizeof(fps_buffer), "fps: %.2f", this->get_fps());
   draw_text(ctx, ctx.width - (font_size * bytes_written / 2.f), font_size, fps_buffer);
 
   // DRAW WINDOW DIMENSIONS.
@@ -259,7 +266,7 @@ void ContextArea::display_nerd_info(const Context& ctx) {
 
 /* SHARED FUNCTIONS */
 
-void ContextArea::setup() {
+void ContextArea::setup(const Context& ctx) {
   spdlog::info("Default Setup");
 }
 
@@ -271,32 +278,29 @@ void ContextArea::draw(const Context& ctx) {}
 
 /**
  * Initiates everything requried to run properly
- *  with FPS Target to 30 FPS
+ *  with fps Target to 30 fps
  */
-void ContextArea::initContextArea() {
+void ContextArea::init_context_area() {
   // Functionality Should work Properly!
-  isInit = true;
+  is_init = true;
 
   Glib::signal_timeout().connect(
     sigc::mem_fun(*this, &ContextArea::on_timeout),
     34
   );
-
-  // SETUP VIRTUAL FUNCTION
-  setup();
 }
 
 /**
  * Initiates everything requried to run properly
- *  with Given FPS Target
+ *  with Given fps Target
  *
- * @param targetFPS - Enumerator for Targeted FPS
+ * @param targetFPS - Enumerator for Targeted fps
  */
-void ContextArea::initContextArea(TARGET_FPS targetFPS) {
+void ContextArea::init_context_area(TARGET_FPS targetFPS) {
   // Functionality Should work Properly!
-  isInit = true;
+  is_init = true;
 
-  // Figure out the Target FPS
+  // Figure out the Target fps
   unsigned int fps_interval;
   switch(targetFPS) {
     case FIFTEEN:
@@ -319,17 +323,14 @@ void ContextArea::initContextArea(TARGET_FPS targetFPS) {
     sigc::mem_fun(*this, &ContextArea::on_timeout),
     fps_interval
   );
-
-  // SETUP VIRTUAL FUNCTION
-  setup();
 }
 
 
 /**
  * @return Calculated Frames Per Second
  */
-const double ContextArea::getFPS() {
-  return FPS;
+const double ContextArea::get_fps() {
+  return fps;
 }
 
 /**
@@ -338,6 +339,6 @@ const double ContextArea::getFPS() {
  * @param x - Reference to x-position of Mouse (Will be stored)
  * @param y - Reference to y-position of Mouse (Will be stored)
  */
-void ContextArea::getMousePosition(double &x, double &y) {
+void ContextArea::get_mouse_position(double &x, double &y) {
   gdk_device_get_position_double(this->device, NULL, &x, &y);
 }

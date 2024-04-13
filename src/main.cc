@@ -14,12 +14,12 @@ class MyApp: public ContextArea {
   public:
     MyApp() {
       spdlog::info("MyApp Constructed");
-      initContextArea(TARGET_FPS::SIXTY);
+      init_context_area(TARGET_FPS::SIXTY);
     }
 
 
   private:    // KEYBOARD EVENTS
-    bool onKeyPress(GdkEventKey* event) {
+    bool on_key_press(GdkEventKey* event) {
       if(event->keyval == GDK_KEY_q) {        // Quit on Key Press 'Q'
         spdlog::info("Quitting out of Application!");
         return false;
@@ -29,19 +29,19 @@ class MyApp: public ContextArea {
       return true;
     }
 
-    bool onKeyRelease(GdkEventKey* event) {     // Similair to KeyPress
+    bool on_key_release(GdkEventKey* event) {     // Similair to KeyPress
       // Return True to keep Running
       return true;
     }
 
-    bool onMousePress(GdkEventButton* event) {
+    bool on_mouse_press(GdkEventButton* event) {
       return true;
     }
 
   private:    // DRAWING FUNCTIONS
     int xc = 0;
 
-    void setup() {
+    void setup(const Context& ctx) {
       spdlog::info("SETTING UP...");
     }
 

@@ -68,17 +68,17 @@ MyWindow::~MyWindow() {
 /* KEYBOARD EVENT CALLBACKS */
 
 bool MyWindow::on_key_press_event(GdkEventKey *event) {
-  if(!drawArea->onKeyPress(event)) this->destroy_();
+  if(!drawArea->on_key_press(event)) this->destroy_();
   return true;
 }
 
 bool MyWindow::on_key_release_event(GdkEventKey *event) {
-  if(!drawArea->onKeyRelease(event)) this->destroy_();
+  if(!drawArea->on_key_release(event)) this->destroy_();
   return true;
 }
 
 /* MOUSE EVENT CALLBACKS */
 bool MyWindow::on_button_press_event(GdkEventButton *event) {
-  if(!drawArea->onMousePress(event)) this->destroy_();
+  if(!drawArea->on_mouse_press(event)) this->destroy_();
 	return true;
 }
