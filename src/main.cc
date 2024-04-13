@@ -146,8 +146,28 @@ class MyApp: public ContextArea {
       // Draw nerd info at the top right.
       display_nerd_info(ctx);
 
-      // Draw Circle Traveling Across Screen
+      // Draw circle bouncing across the screen.
       circle(ctx, circle_body1.loc.x, circle_body1.loc.y, circle_body1.radius, RED);
+
+      // DEBUG: Draw the circle body's state stats.
+      set_font_size(ctx, 25.f);
+      char body_d_stat_buffer[255];
+      snprintf(body_d_stat_buffer, sizeof(body_d_stat_buffer), "d[x=%.2f|y=%2.f]", circle_body1.loc.x, circle_body1.loc.y);
+      draw_text(
+        ctx,
+        circle_body1.loc.x,
+        circle_body1.loc.y - 30.f,
+        body_d_stat_buffer
+      );
+
+      char body_a_stat_buffer[255];
+      snprintf(body_a_stat_buffer, sizeof(body_a_stat_buffer), "a[x=%.2f|y=%2.f]", circle_body1.acceleration.x, circle_body1.acceleration.y);
+      draw_text(
+        ctx,
+        circle_body1.loc.x,
+        circle_body1.loc.y - 60.f,
+        body_a_stat_buffer
+      );
 
       // Update the physics on bodies.
       update_physics(ctx, &circle_body1);
