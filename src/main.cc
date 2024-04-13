@@ -14,7 +14,7 @@ class MyApp: public ContextArea {
   public:
     MyApp() {
       spdlog::info("MyApp Constructed");
-      initContextArea();
+      initContextArea(TARGET_FPS::SIXTY);
     }
 
 
@@ -54,6 +54,9 @@ class MyApp: public ContextArea {
         .a = 1.0,
       });
 
+      // Draw nerd info at the top right.
+      display_nerd_info(ctx);
+
       // Draw Circle Traveling Across Sceen
       circle(ctx, xc, ctx.height/2, 20, RgbaColor{
         .r = 1.0,
@@ -63,7 +66,7 @@ class MyApp: public ContextArea {
       });
 
       // Increment xc Till the Edge
-      xc = (xc + 2) % ctx.width;
+      xc = (xc + 20) % ctx.width;
     }
 };
 
