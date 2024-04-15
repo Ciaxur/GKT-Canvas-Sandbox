@@ -23,7 +23,7 @@ build: libspdlog.a ContextArea.o MyWindow.o
 
 # Builds the spdlog shared library.
 libspdlog.a:
-	cd $(SPDLOG_GIT); cd build; cmake ..; make -j 4; mv $(PWD)/$(SPDLOG_GIT)/build/libspdlog.a $(PWD)/.
+	cd $(SPDLOG_GIT); mkdir -p build; cd build; cmake ..; make -j 4; mv $(PWD)/$(SPDLOG_GIT)/build/libspdlog.a $(PWD)/.
 
 ContextArea.o:
 	$(CC) $(FLAGS) $(INCLUDES) $(SRC_DIR)/ContextArea.cc -c -o ContextArea.o
