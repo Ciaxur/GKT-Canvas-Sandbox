@@ -251,16 +251,23 @@ void ContextArea::display_nerd_info(const Context& ctx) {
   set_color(ctx, RgbaColor{ .r = 3.0, .a = 1.0 });
   set_font_size(ctx, font_size);
 
+  // Store the extents of a text in order to grab the dimensions.
+  Cairo::TextExtents f_extents;
+
   // DRAW fps COUNTER.
   // Interpret fps double as a string.
   char fps_buffer[255];
   int bytes_written = snprintf(fps_buffer, sizeof(fps_buffer), "fps: %.2f", this->get_fps());
-  draw_text(ctx, ctx.width - (font_size * bytes_written / 2.f), font_size, fps_buffer);
+
+  ctx.cairo_ctx->get_text_extents(fps_buffer, f_extents);
+  draw_text(ctx, ctx.width - (f_extents.width + 5.f), font_size, fps_buffer);
 
   // DRAW WINDOW DIMENSIONS.
   char dim_buffer[255];
   bytes_written = snprintf(dim_buffer, sizeof(dim_buffer), "Window: width[%d] height[%d]", ctx.width, ctx.height);
-  draw_text(ctx, ctx.width - (font_size * bytes_written / 2.f) - 4.f, font_size + font_size + 2.0, dim_buffer);
+
+  ctx.cairo_ctx->get_text_extents(dim_buffer, f_extents);
+  draw_text(ctx, ctx.width - (f_extents.width + 5.f), font_size + font_size + 2.0, dim_buffer);
 }
 
 
