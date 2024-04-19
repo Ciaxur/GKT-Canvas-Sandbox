@@ -6,6 +6,8 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+const double GRAVITATIONAL_CONST = 1.f;
+
 struct Vector2D {
   double x;
   double y;
@@ -13,12 +15,15 @@ struct Vector2D {
 
 struct Body {
   // Coordinates.
-  Vector2D loc;
+  Vector2D pos;
+
+  RgbaColor color;
 
   // TODO: implement better bounding.
   double radius;
 
   // Physics!
+  double mass;
   Vector2D velocity;
   Vector2D acceleration;
 };
@@ -27,6 +32,12 @@ struct Body {
 static const RgbaColor RED{
   .r = 1.0,
   .g = 0.0,
+  .b = 0.0,
+  .a = 1.0,
+};
+static const RgbaColor GREEN{
+  .r = 0.0,
+  .g = 1.0,
   .b = 0.0,
   .a = 1.0,
 };
@@ -82,127 +93,177 @@ class MyApp: public ContextArea {
     }
 
   private:    // DRAWING FUNCTIONS
-    Vector2D gravity{
-      .x = 0.f,
-      .y = 0.1f,
-    };
-    Body circle_body1;
+    std::vector<Body> bodies;
 
     void setup(const Context& ctx) {
       spdlog::info("SETTING UP...");
 
-      this->circle_body1 = Body {
+      this->bodies.push_back({
         // Intiial position.
-        .loc = Vector2D{
+        .pos = Vector2D{
           .x = ctx.width / 2.f,
           .y = ctx.height / 2.f,
         },
+        .color = RED,
         .radius = 20.f,
 
         // Initial force.
+        .mass = 500.f,
         .velocity = Vector2D{
           .x = 0.f,
           .y = 0.f,
         },
         .acceleration = Vector2D{
-          .x = 5.f,
+          .x = 0.f,
           .y = 0.f,
         },
-      };
+      });
+
+      this->bodies.push_back({
+        // Intiial position.
+        .pos = Vector2D{
+          .x = (ctx.width / 2.f) + (20.f * 4.f),
+          .y = ctx.height / 2.f,
+        },
+        .color = BLUE,
+        .radius = 20.f,
+
+        // Initial force.
+        .mass = 10.f,
+        .velocity = Vector2D{
+          .x = 0.f,
+          .y = 0.f,
+        },
+        .acceleration = Vector2D{
+          .x = 0.8f,
+          .y = 1.5f,
+        },
+      });
     }
 
-    void update_physics(const Context& ctx, Body *body) {
-      // Apply gravity.
-      body->acceleration.y += gravity.y;
+    // Transfers energy from one body to another.
+    void energy_transfer(Body *body1, Body *body2) {}
 
-      // Apply velocity.
-      body->velocity.x += body->acceleration.x;
-      body->velocity.y += body->acceleration.y;
+    double distance(const Body &body1, const Body &body2) {
+      return std::sqrt(
+        std::pow(body2.pos.x - body1.pos.x, 2) + std::pow(body2.pos.y - body1.pos.y, 2)
+      );
 
-      // Apply displacement.
-      body->loc.x += body->velocity.x;
-      body->loc.y += body->velocity.y;
+    }
 
-      // Apply bounce when contacting an edge.
-      // Bottom edge.
-      if (body->loc.y + body->radius>= ctx.height) {
-        body->acceleration.y *= -1.f;
-        body->loc.y = ctx.height - body->radius - 1.f;
+    // Calculates the force exertered on body1 from body2.
+    Vector2D calculate_force_on_body(const Body &body1, const Body &body2) {
+      double r = distance(body1, body2);
+      double f_mag = GRAVITATIONAL_CONST * ( (body1.mass * body2.mass) / std::pow(r, 2) );
+      double angle = std::atan2( body2.pos.y - body1.pos.y, body2.pos.x - body1.pos.x );
+      return { f_mag * std::cos(angle), f_mag * std::sin(angle) };
+    }
+
+    void draw_force_on_body(const Context &ctx, const Body &b1, Vector2D force) {
+      // Magical multiplier to so we can see the force arrow.
+      Vector2D p1{
+        b1.pos.x + force.x / b1.mass,
+        b1.pos.y + force.y / b1.mass,
+      };
+
+      draw_line(
+        ctx,
+        b1.pos,
+        p1,
+        GREEN
+      );
+    }
+
+    void update_physics(const Context& ctx, std::vector<Body> &bodies) {
+      for (size_t i = 0; i < bodies.size(); i++) {
+        Body *body = &bodies[i];
+
+        // Calculate the gravitational force between all bodies.
+        for (size_t j = 0; j < bodies.size(); j++) {
+          // Ignore self.
+          if (i == j) continue;
+          Body other_body = bodies[j];
+
+          // TODO: make sure bodies aren't overlapping.
+          Vector2D force = calculate_force_on_body(*body, other_body);
+
+          // Update acceleration on each other.
+          body->acceleration.x += force.x / body->mass;
+          body->acceleration.y += force.y / body->mass;
+
+          draw_force_on_body(ctx, *body, force);
+        }
+
+        // Update velocity and displacement.
+        body->velocity.x += body->acceleration.x;
+        body->velocity.y += body->acceleration.y;
+
+        body->pos.x += body->velocity.x;
+        body->pos.y += body->velocity.y;
+
+        // Reset acceleration.
+        body->acceleration.x = 0.f;
+        body->acceleration.y = 0.f;
+
+        draw_body_stats(ctx, *body);
       }
 
-      // Top edge.
-      if (body->loc.y - body->radius <= 0) {
-        body->acceleration.y *= -1.f;
-        body->loc.y = body->radius + 1.0f;
-      }
+    }
 
-      // Left edge.
-      if (body->loc.x - body->radius <= 0) {
-        body->acceleration.x *= -1.f;
-        body->loc.x = body->radius + 1.0f;
-      }
-
-      // Right edge.
-      if (body->loc.x + body->radius >= ctx.width) {
-        body->acceleration.x *= -1.f;
-        body->loc.x = ctx.width - body->radius - 1.f;
-      }
-
+    void draw_body_stats(const Context& ctx, const Body &body) {
       // STATS/DEBUG: //
-      double text_offset = 30.f;
-
+      double text_offset = 18.f;
+      double font_size = 12.f;
 
       // Draw the circle body's state stats.
-      set_font_size(ctx, 25.f);
+      set_color(ctx, RED);
+      set_font_size(ctx, font_size);
       char body_d_stat_buffer[255];
-      snprintf(body_d_stat_buffer, sizeof(body_d_stat_buffer), "d[x=%.2f|y=%2.f]", circle_body1.loc.x, circle_body1.loc.y);
+      snprintf(body_d_stat_buffer, sizeof(body_d_stat_buffer), "d[x=%.2f|y=%2.f]", body.pos.x, body.pos.y);
       draw_text(
         ctx,
-        circle_body1.loc.x,
-        circle_body1.loc.y - text_offset,
+        body.pos.x,
+        body.pos.y - text_offset,
         body_d_stat_buffer
       );
 
       char body_a_stat_buffer[255];
-      snprintf(body_a_stat_buffer, sizeof(body_a_stat_buffer), "a[x=%.2f|y=%2.f]", circle_body1.acceleration.x, circle_body1.acceleration.y);
+      snprintf(body_a_stat_buffer, sizeof(body_a_stat_buffer), "a[x=%.2f|y=%2.f]", body.acceleration.x, body.acceleration.y);
       draw_text(
         ctx,
-        circle_body1.loc.x,
-        circle_body1.loc.y - (text_offset * 2.f),
+        body.pos.x,
+        body.pos.y - (text_offset * 2.f),
         body_a_stat_buffer
       );
 
 
       // Draw direction of force.
-      double magnitude = std::sqrt(body->velocity.x * body->velocity.x + body->velocity.y * body->velocity.y);
-      double direction_rad = std::atan2(body->velocity.y, body->velocity.x);
+      double magnitude = std::sqrt(body.velocity.x * body.velocity.x + body.velocity.y * body.velocity.y);
+      double direction_rad = std::atan2(body.velocity.y, body.velocity.x);
       double direction_deg = direction_rad * 180.f / M_PI;
 
       draw_line(
         ctx,
-        body->loc,
+        body.pos,
         Vector2D{
-          .x = body->loc.x + magnitude * std::cos(direction_rad),
-          .y = body->loc.y + magnitude * std::sin(direction_rad),
-        }
+          .x = body.pos.x + magnitude * std::cos(direction_rad),
+          .y = body.pos.y + magnitude * std::sin(direction_rad),
+        },
+        RED
       );
 
       char body_mag_buffer[255];
       snprintf(body_mag_buffer, sizeof(body_mag_buffer), "mag=%.2f | direction=%.2frad", magnitude, direction_rad);
       draw_text(
         ctx,
-        circle_body1.loc.x,
-        circle_body1.loc.y - (text_offset * 3.f),
+        body.pos.x,
+        body.pos.y - (text_offset * 3.f),
         body_mag_buffer
       );
-
-      // Reset velocity.
-      body->velocity.x = 0;
-      body->velocity.y = 0;
     }
 
-    void draw_line(const Context& ctx, Vector2D pos1, Vector2D pos2) {
-      set_color(ctx, BLUE);
+    void draw_line(const Context& ctx, Vector2D pos1, Vector2D pos2, RgbaColor color) {
+      set_color(ctx, color);
       ctx.cairo_ctx->set_line_width(10.f);
       ctx.cairo_ctx->set_line_cap(Cairo::LINE_CAP_ROUND);
       ctx.cairo_ctx->move_to(pos1.x, pos1.y);
@@ -217,11 +278,13 @@ class MyApp: public ContextArea {
       // Draw nerd info at the top right.
       display_nerd_info(ctx);
 
-      // Draw circle bouncing across the screen.
-      circle(ctx, circle_body1.loc.x, circle_body1.loc.y, circle_body1.radius, RED);
+      // Draw them bodies.
+      for (const auto body : this->bodies) {
+        circle(ctx, body.pos.x, body.pos.y, body.radius, body.color);
+      }
 
       // Update the physics on bodies.
-      update_physics(ctx, &circle_body1);
+      update_physics(ctx, bodies);
     }
 };
 
@@ -231,7 +294,7 @@ int main(int argc, char *argv[]) {
   // START WINDOW + APP
   auto gtk_application = Gtk::Application::create(argc, argv, "org.gtkmm.sandbox.base");
   MyApp my_app;
-  MyWindow window(my_app, 200, 200, "GTK Canvas Sandbox");
+  MyWindow window(my_app, 800, 800, "GTK Canvas Sandbox");
 
   // Run the Application
   return gtk_application->run(window);
