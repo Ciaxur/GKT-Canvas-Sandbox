@@ -142,13 +142,42 @@ class MyApp: public ContextArea {
     }
 
     // Transfers energy from one body to another.
-    void energy_transfer(Body *body1, Body *body2) {}
+    void transfer_energy(Body *b1, Body *b2) {
+      // Conservation of momentum!
+      double total_mass = b1->mass + b2->mass;
+
+      Vector2D b1_v{
+        ( 2.f * b2->mass * b2->velocity.x + (b1->mass - b2->mass) * b1->velocity.x) / total_mass,
+        ( 2.f * b2->mass * b2->velocity.y + (b1->mass - b2->mass) * b1->velocity.y) / total_mass,
+      };
+      Vector2D b2_v{
+        ( 2.f * b1->mass * b1->velocity.x + (b2->mass - b1->mass) * b2->velocity.x) / total_mass,
+        ( 2.f * b1->mass * b1->velocity.y + (b2->mass - b1->mass) * b2->velocity.y) / total_mass,
+      };
+
+      b1->velocity = b1_v;
+      b2->velocity = b2_v;
+    }
 
     double distance(const Body &body1, const Body &body2) {
       return std::sqrt(
         std::pow(body2.pos.x - body1.pos.x, 2) + std::pow(body2.pos.y - body1.pos.y, 2)
       );
 
+    }
+
+    Vector2D midpoint(const Body &b1, const Body &b2) {
+      double dx = b2.pos.x - b1.pos.x;
+      double dy = b2.pos.y - b1.pos.y;
+      return {
+        b1.pos.x + (dx / 2.f),
+        b1.pos.y + (dy / 2.f)
+      };
+    }
+
+    bool is_collide(const Body &b1, const Body &b2) {
+      double d = distance(b1, b2);
+      return b1.radius + b2.radius > d;
     }
 
     // Calculates the force exertered on body1 from body2.
@@ -174,7 +203,7 @@ class MyApp: public ContextArea {
       );
     }
 
-    void update_physics(const Context& ctx, std::vector<Body> &bodies) {
+    void update_physics(const Context &ctx, std::vector<Body> &bodies) {
       for (size_t i = 0; i < bodies.size(); i++) {
         Body *body = &bodies[i];
 
@@ -184,14 +213,15 @@ class MyApp: public ContextArea {
           if (i == j) continue;
           Body other_body = bodies[j];
 
-          // TODO: make sure bodies aren't overlapping.
           Vector2D force = calculate_force_on_body(*body, other_body);
+          draw_force_on_body(ctx, *body, force);
+
+          if (is_collide(*body, other_body))
+            transfer_energy(body, &other_body);
 
           // Update acceleration on each other.
           body->acceleration.x += force.x / body->mass;
           body->acceleration.y += force.y / body->mass;
-
-          draw_force_on_body(ctx, *body, force);
         }
 
         // Update velocity and displacement.
@@ -210,7 +240,7 @@ class MyApp: public ContextArea {
 
     }
 
-    void draw_body_stats(const Context& ctx, const Body &body) {
+    void draw_body_stats(const Context &ctx, const Body &body) {
       // STATS/DEBUG: //
       double text_offset = 18.f;
       double font_size = 12.f;
@@ -271,6 +301,10 @@ class MyApp: public ContextArea {
       ctx.cairo_ctx->stroke();
     }
 
+    void draw_body_on_mouse(const Context& ctx, Body *body) {
+      this->get_mouse_position(body->pos.x, body->pos.y);
+    }
+
     void draw(const Context& ctx) {
       // Draw Background Color
       background(ctx, BACKGROUND_COLOR);
@@ -282,6 +316,9 @@ class MyApp: public ContextArea {
       for (const auto body : this->bodies) {
         circle(ctx, body.pos.x, body.pos.y, body.radius, body.color);
       }
+
+      // DEBUG:
+      // draw_body_on_mouse(ctx, &this->bodies[0]);
 
       // Update the physics on bodies.
       update_physics(ctx, bodies);
