@@ -5,6 +5,7 @@
 // MATHS
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <deque>
 
 const double GRAVITATIONAL_CONST = 1.f;
 
@@ -26,6 +27,9 @@ struct Body {
   double mass;
   Vector2D velocity;
   Vector2D acceleration;
+
+  std::deque<Vector2D> trail;
+  size_t max_trail_size;
 };
 
 // Static color definitions.
@@ -44,6 +48,12 @@ static const RgbaColor GREEN{
 static const RgbaColor BLUE{
   .r = 0.0,
   .g = 0.0,
+  .b = 1.0,
+  .a = 1.0,
+};
+static const RgbaColor CYAN{
+  .r = 0.0,
+  .g = 1.0,
   .b = 1.0,
   .a = 1.0,
 };
@@ -117,6 +127,7 @@ class MyApp: public ContextArea {
           .x = 0.f,
           .y = 0.f,
         },
+        .max_trail_size = 32,
       });
 
       this->bodies.push_back({
@@ -135,9 +146,10 @@ class MyApp: public ContextArea {
           .y = 0.f,
         },
         .acceleration = Vector2D{
-          .x = 0.8f,
-          .y = 1.5f,
+          .x = 0.f,
+          .y = 2.5f,
         },
+        .max_trail_size = 32,
       });
     }
 
@@ -180,6 +192,15 @@ class MyApp: public ContextArea {
       return b1.radius + b2.radius > d;
     }
 
+    void unlodge_bodies(Body *b1, Body *b2) {
+      double d = distance(*b1, *b2);
+      double dx = (b2->pos.x - b1->pos.x) / d;
+      double dy = (b2->pos.y - b1->pos.y) / d;
+
+      b1->pos.x -= dx;
+      b1->pos.y -= dy;
+    }
+
     // Calculates the force exertered on body1 from body2.
     Vector2D calculate_force_on_body(const Body &body1, const Body &body2) {
       double r = distance(body1, body2);
@@ -216,8 +237,10 @@ class MyApp: public ContextArea {
           Vector2D force = calculate_force_on_body(*body, other_body);
           draw_force_on_body(ctx, *body, force);
 
-          if (is_collide(*body, other_body))
+          if (is_collide(*body, other_body)) {
             transfer_energy(body, &other_body);
+            unlodge_bodies(body, &other_body);
+          }
 
           // Update acceleration on each other.
           body->acceleration.x += force.x / body->mass;
@@ -313,7 +336,26 @@ class MyApp: public ContextArea {
       display_nerd_info(ctx);
 
       // Draw them bodies.
-      for (const auto body : this->bodies) {
+      for (Body &body : this->bodies) {
+        // Draw trail.
+        for (size_t i = 0; i < body.trail.size(); i++) {
+          const Vector2D &trail = body.trail[i];
+          RgbaColor color = CYAN;
+
+          // Normalized change in trail alpha mapped to the number of max trails.
+          float trail_off_alpha_dt = 1.f - ((i - 0.f) / (body.max_trail_size - 0.f));
+          color.a = trail_off_alpha_dt;
+
+          circle(ctx, trail.x, trail.y, body.radius / 2.f, color);
+        }
+
+        // Track trail.
+        if (body.trail.size() >= body.max_trail_size)
+          body.trail.pop_front();
+
+        // Copy the current state of the trail.
+        body.trail.push_back(body.pos);
+
         circle(ctx, body.pos.x, body.pos.y, body.radius, body.color);
       }
 

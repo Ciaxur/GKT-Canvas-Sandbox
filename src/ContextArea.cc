@@ -199,7 +199,7 @@ void ContextArea::background(const Context& ctx, RgbaColor color) {
  * @param r - Circle's radius.
  * @param color - RgbaColor struct.
  */
-void ContextArea::circle(const Context& ctx, double x, double y, double r, RgbaColor color) {
+void ContextArea::circle(const Context& ctx, double x, double y, double r, const RgbaColor &color) {
   set_color(ctx, color);
   ctx.cairo_ctx->arc(x, y, r, 0, M_PI*2);
   ctx.cairo_ctx->fill();
@@ -211,7 +211,7 @@ void ContextArea::circle(const Context& ctx, double x, double y, double r, RgbaC
  * @param ctx - Drawing Context
  * @param color - RgbaColor struct.
  */
-void ContextArea::set_color(const Context& ctx, RgbaColor color) {
+void ContextArea::set_color(const Context& ctx, const RgbaColor &color) {
   ctx.cairo_ctx->set_source_rgba(color.r, color.g, color.b, color.a);
 }
 

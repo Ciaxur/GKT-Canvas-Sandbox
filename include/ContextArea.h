@@ -80,10 +80,10 @@ class ContextArea: public Gtk::DrawingArea {
     void background(const Context&, RgbaColor);                 // Draws background color.
 
     // Draws a circle at given coordinates.
-    void circle(const Context&, double x, double y, double r, RgbaColor);
+    void circle(const Context&, double x, double y, double r, const RgbaColor&);
 
     // Sets drawing context color.
-    void set_color(const Context&, RgbaColor);
+    void set_color(const Context&, const RgbaColor&);
 
     // Sets drawing context text font size.
     void set_font_size(const Context&, double);
